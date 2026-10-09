@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="am" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>የ90 ቀናት የአልማዝ ማንነት ጉዞ | የአቴንዳንስና የፈተና ፖርታል</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 antialiased">
+
+  <div id="loginScreen" class="max-w-md mx-auto min-h-screen flex items-center justify-center p-4">
+    <div class="w-full bg-slate-800/90 border border-slate-700 backdrop-blur-xl p-7 rounded-3xl shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-rose-500 text-white rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-rose-500/20">
+        👑
+      </div>
+      <div>
+        <h1 class="text-xl font-black text-white">የ90 ቀናት የአልማዝ ማንነት ጉዞ</h1>
+        <p class="text-xs text-slate-400 mt-1">የስነ-ልቦና፣ የዕለት አቴንዳንስና የፈተናዎች ፖርታል</p>
+      </div>
+
+      <div class="space-y-3 pt-2 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">ስምሽ</label>
+          <input type="text" id="traineeName" placeholder="ለምሳሌ፡ ኤደን" class="w-full py-3 px-4 bg-slate-900 border border-slate-700 rounded-2xl text-xs text-white focus:outline-none focus:border-rose-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">የኮች መግቢያ ቁልፍ (Passcode)</label>
+          <input type="password" id="traineeCode" placeholder="121921" class="w-full py-3 px-4 bg-slate-900 border border-slate-700 rounded-2xl text-xs text-center tracking-widest text-white focus:outline-none focus:border-rose-500">
+        </div>
+
+        <button type="button" onclick="loginTrainee()" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 hover:opacity-95 font-bold rounded-2xl text-xs text-white shadow-lg transition">
+          ወደ የግል ፖርታሌ ግባ ➔
+        </button>
+        <p id="loginError" class="text-xs text-rose-400 font-semibold text-center hidden">የተሳሳተ መግቢያ ኮድ ነው!</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="mainDashboard" class="hidden max-w-xl mx-auto p-4 space-y-5">
+    
+    <div class="flex items-center justify-between bg-slate-800/80 border border-slate-700/80 p-4 rounded-3xl backdrop-blur-md">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-2xl flex items-center justify-center text-xl shadow-md">
+          💎
+        </div>
+        <div>
+          <h2 id="dashGreeting" class="text-sm font-extrabold text-white">ሰላም እህቴ</h2>
+          <p id="dashStageBadge" class="text-[11px] font-semibold text-amber-400">ደረጃ 1፦ ጭቃውን ሰባሪዋ ዘር 🏅</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="flex items-center gap-1 text-rose-500 font-black text-sm justify-end">
+          🔥 <span id="streakCount">0</span> ቀን
+        </div>
+        <p class="text-[10px] text-slate-400">የቀጠለ ጽናት</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-800 text-xs font-bold text-center">
+      <button type="button" onclick="switchTab('daily')" id="tabDaily" class="py-2.5 rounded-xl bg-slate-700 text-white shadow transition">
+        📅 የቀን አቴንዳንስ
+      </button>
+      <button type="button" onclick="switchTab('weekly')" id="tabWeekly" class="py-2.5 rounded-xl text-slate-400 hover:text-white transition">
+        📝 ሳምንታዊ ፈተና
+      </button>
+      <button type="button" onclick="switchTab('monthly')" id="tabMonthly" class="py-2.5 rounded-xl text-slate-400 hover:text-white transition">
+        🏆 የወር & ፋይናል
+      </button>
+    </div>
+
+    <div id="sectionDaily" class="space-y-4">
+      <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-3xl space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white">የዛሬው የ3ቱ ድሎች አቴንዳንስ</h3>
+            <p id="currentDateStr" class="text-[11px] text-slate-400">ዛሬን በድል ጀምሪ</p>
+          </div>
+          <span class="text-xs font-bold px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+            ቀን <span id="currentDayNum">1</span> / 90
+          </span>
+        </div>
+
+        <div class="space-y-2.5 pt-1 text-xs">
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-2xl border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+            <input type="checkbox" id="habit1" onchange="checkDailyCompletion()" class="w-4 h-4 rounded text-rose-500 focus:ring-rose-500">
+            <div>
+              <p class="font-bold text-slate-200">1. የማለዳ ምስጋና እና የጸሎት ግንኙነት (10 ደቂቃ)</p>
+              <p class="text-[10px] text-slate-400">ቀኑን ሳልበሳጭና ሳልፈራ በውስጥ ሰላም ጀምሬያለሁ</p>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-2xl border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+            <input type="checkbox" id="habit2" onchange="checkDailyCompletion()" class="w-4 h-4 rounded text-rose-500 focus:ring-rose-500">
+            <div>
+              <p class="font-bold text-slate-200">2. የኮች የንቃት ትምህርት / ኦዲዮ ማዳመጥ (15 ደቂቃ)</p>
+              <p class="text-[10px] text-slate-400">አስተሳሰቤንና አእምሮዬን በአዲስ እውቀት መግቤያለሁ</p>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-3 p-3 bg-slate-900/60 rounded-2xl border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+            <input type="checkbox" id="habit3" onchange="checkDailyCompletion()" class="w-4 h-4 rounded text-rose-500 focus:ring-rose-500">
+            <div>
+              <p class="font-bold text-slate-200">3. የክብር ድንበር እና የቁጠባ ቁርጠኝነት</p>
+              <p class="text-[10px] text-slate-400">ስሜቴን ጠብቄያለሁ፣ ለራሴ የወደፊት ነጻነት ቆሜያለሁ</p>
+            </div>
+          </label>
+        </div>
+
+        <button type="button" id="btnSubmitDaily" onclick="submitDailyAttendance()" disabled class="w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-2xl text-xs transition cursor-not-allowed">
+          የዛሬውን አቴንዳንስ መዝግብ 🔥
+        </button>
+      </div>
+
+      <div class="bg-slate-800/60 border border-slate-800 p-4 rounded-3xl space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold text-slate-300">የ90 ቀናት የጉዞ ካርታ</span>
+          <span class="text-slate-400"><strong id="completedDaysCount" class="text-rose-400">0</strong> / 90 ተጠናቋል</span>
+        </div>
+        <div id="daysGrid" class="grid grid-cols-10 gap-1 text-[9px] font-bold text-center"></div>
+      </div>
+    </div>
+
+    <div id="sectionWeekly" class="hidden space-y-4">
+      <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-3xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div>
+            <h3 class="text-sm font-bold text-white">የሳምንቱ የተግባር ምዘና</h3>
+            <p class="text-[11px] text-slate-400">በየሳምንቱ እውነተኛ ለውጥሽን የምታረጋግጪበት</p>
+          </div>
+          <select id="weeklySelect" onchange="loadWeeklyQuestions()" class="bg-slate-900 border border-slate-700 text-xs font-bold text-amber-400 rounded-xl px-2 py-1.5 focus:outline-none">
+            <option value="1">ሳምንት 1</option>
+            <option value="2">ሳምንት 2</option>
+            <option value="3">ሳምንት 3</option>
+            <option value="4">ሳምንት 4</option>
+            <option value="5">ሳምንት 5</option>
+            <option value="6">ሳምንት 6</option>
+            <option value="7">ሳምንት 7</option>
+            <option value="8">ሳምንት 8</option>
+            <option value="9">ሳምንት 9</option>
+            <option value="10">ሳምንት 10</option>
+            <option value="11">ሳምንት 11</option>
+            <option value="12">ሳምንት 12</option>
+          </select>
+        </div>
+
+        <form id="weeklyQuizForm" onsubmit="submitWeeklyQuiz(event)" class="space-y-3 text-xs">
+          <div id="weeklyQuestionsContainer" class="space-y-3"></div>
+
+          <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg transition">
+            የሳምንቱን ውጤት መዝግብና ሰርተፊኬት አሳይ ➔
+          </button>
+        </form>
+      </div>
+
+      <div id="weeklyResultCard" class="hidden bg-slate-800 border border-amber-500/40 p-5 rounded-3xl text-center space-y-3">
+        <div class="text-3xl">🎖️</div>
+        <h4 class="text-sm font-black text-amber-400">እንኳን ደስ አለሽ! የሳምንቱ ምዘና ተጠናቋል!</h4>
+        <p id="weeklyFeedbackText" class="text-xs text-slate-300 leading-relaxed"></p>
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button type="button" onclick="sendWeeklyToCoach('tg')" class="py-2.5 bg-sky-500 font-bold rounded-xl text-xs text-white">
+            ✈️ ለኮች በቴሌግራም ላኪ
+          </button>
+          <button type="button" onclick="sendWeeklyToCoach('wa')" class="py-2.5 bg-emerald-600 font-bold rounded-xl text-xs text-white">
+            💬 ለኮች በዋትስአፕ ላኪ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sectionMonthly" class="hidden space-y-4">
+      <div class="grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="p-3 bg-slate-800 border border-slate-700 rounded-2xl">
+          <span class="text-lg">🌱</span>
+          <p class="font-bold text-white mt-1">ወር 1</p>
+          <span class="text-[10px] text-amber-400">ንቃት</span>
+        </div>
+        <div class="p-3 bg-slate-800 border border-slate-700 rounded-2xl">
+          <span class="text-lg">🛡️</span>
+          <p class="font-bold text-white mt-1">ወር 2</p>
+          <span class="text-[10px] text-slate-400">ድንበር & ጽናት</span>
+        </div>
+        <div class="p-3 bg-slate-800 border border-slate-700 rounded-2xl">
+          <span class="text-lg">💎</span>
+          <p class="font-bold text-white mt-1">ወር 3</p>
+          <span class="text-[10px] text-slate-400">ነጻነት & ሀብት</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-3xl space-y-4">
+        <h3 class="text-sm font-bold text-white border-b border-slate-700/70 pb-2">የወር ትራንስፎርሜሽን ጥልቅ መመዘኛ</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          ይህ ፈተና በየ 30 ቀኑ የሚወሰድ ሲሆን፣ አስተሳሰብሽ ምን ያህል እንደተቀየረ፣ በስራሽ ውስጥ ድንበር ማስከበር መቻልሽን እና የገንዘብ ቁጠባሽን ይፈትናል።
+        </p>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">1. በዚህ ወር ውስጥ ያሸነፍሽው ትልቁ ፍርሃት ወይም ጭንቀት ምንድነው?</label>
+            <textarea id="monthQ1" rows="2" placeholder="በግልጽ ጻፊ..." class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none"></textarea>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">2. ለማዳም ወይም ለቤተሰብ 'አይሆንም' ብለሽ ድንበርሽን ያስከበርሽበት ትልቁ አጋጣሚ?</label>
+            <textarea id="monthQ2" rows="2" placeholder="በግልጽ ጻፊ..." class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none"></textarea>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">3. በዚህ ወር ለራስሽ የቆጠብሽው የተጣራ የገንዘብ መጠን?</label>
+            <input type="text" id="monthQ3" placeholder="ለምሳሌ፡ 1,500 ሪያል" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none">
+          </div>
+        </div>
+
+        <button type="button" onclick="submitMonthlyEvaluation()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-rose-600 font-bold rounded-2xl text-xs text-white shadow-lg transition">
+          የወሩን ሪፖርት ለኮች በቀጥታ ላኪ ➔
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const COACH_PASSCODE = "121921";
+    const COACH_PHONE = "251948622684";
+    const COACH_TG = "Yohannesmezgebu";
+
+    let currentUser = localStorage.getItem('app_user_name') || "";
+    let completedDays = JSON.parse(localStorage.getItem('app_completed_days') || "[]");
+    let streakCount = parseInt(localStorage.getItem('app_streak') || "0");
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (currentUser) {
+        showDashboard();
+      }
+      renderDaysGrid();
+      loadWeeklyQuestions();
+    });
+
+    function loginTrainee() {
+      const name = document.getElementById('traineeName').value.trim();
+      const code = document.getElementById('traineeCode').value.trim();
+      const err = document.getElementById('loginError');
+
+      if (code === COACH_PASSCODE && name.length >= 2) {
+        localStorage.setItem('app_user_name', name);
+        currentUser = name;
+        err.classList.add('hidden');
+        showDashboard();
+      } else {
+        err.classList.remove('hidden');
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
+      document.getElementById('dashGreeting').innerText = `ሰላም ${currentUser} 🌟`;
+      document.getElementById('streakCount').innerText = streakCount;
+      document.getElementById('completedDaysCount').innerText = completedDays.length;
+      document.getElementById('currentDayNum').innerText = completedDays.length + 1;
+
+      // Update Stage Badge
+      const badge = document.getElementById('dashStageBadge');
+      if (completedDays.length < 30) {
+        badge.innerText = "ደረጃ 1፦ ጭቃውን ሰባሪዋ ዘር 🌱";
+      } else if (completedDays.length < 60) {
+        badge.innerText = "ደረጃ 2፦ በእሳት የተፈተነችው ብረት 🛡️";
+      } else {
+        badge.innerText = "ደረጃ 3፦ ያልተሰበረችው ባለራዕይ አልማዝ 💎";
+      }
+    }
+
+    function switchTab(tab) {
+      document.getElementById('sectionDaily').classList.add('hidden');
+      document.getElementById('sectionWeekly').classList.add('hidden');
+      document.getElementById('sectionMonthly').classList.add('hidden');
+
+      document.getElementById('tabDaily').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabWeekly').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabMonthly').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
+
+      if (tab === 'daily') {
+        document.getElementById('sectionDaily').classList.remove('hidden');
+        document.getElementById('tabDaily').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+      } else if (tab === 'weekly') {
+        document.getElementById('sectionWeekly').classList.remove('hidden');
+        document.getElementById('tabWeekly').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+      } else {
+        document.getElementById('sectionMonthly').classList.remove('hidden');
+        document.getElementById('tabMonthly').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+      }
+    }
+
+    function checkDailyCompletion() {
+      const h1 = document.getElementById('habit1').checked;
+      const h2 = document.getElementById('habit2').checked;
+      const h3 = document.getElementById('habit3').checked;
+      const btn = document.getElementById('btnSubmitDaily');
+
+      if (h1 && h2 && h3) {
+        btn.disabled = false;
+        btn.className = "w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg cursor-pointer transition animate-pulse";
+      } else {
+        btn.disabled = true;
+        btn.className = "w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-2xl text-xs transition cursor-not-allowed";
+      }
+    }
+
+    function submitDailyAttendance() {
+      const todayNum = completedDays.length + 1;
+      if (!completedDays.includes(todayNum)) {
+        completedDays.push(todayNum);
+        streakCount += 1;
+        localStorage.setItem('app_completed_days', JSON.stringify(completedDays));
+        localStorage.setItem('app_streak', streakCount.toString());
+      }
+
+      alert(`🎉 ድንቅ ነው ${currentUser}! የቀን ${todayNum} አቴንዳንስሽን በድል መዝግበሻል!`);
+      showDashboard();
+      renderDaysGrid();
+
+      document.getElementById('habit1').checked = false;
+      document.getElementById('habit2').checked = false;
+      document.getElementById('habit3').checked = false;
+      checkDailyCompletion();
+    }
+
+    function renderDaysGrid() {
+      const container = document.getElementById('daysGrid');
+      container.innerHTML = "";
+      for (let i = 1; i <= 90; i++) {
+        const isDone = completedDays.includes(i);
+        const div = document.createElement('div');
+        div.className = `p-1.5 rounded-lg border ${isDone ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-600'}`;
+        div.innerText = i;
+        container.appendChild(div);
+      }
+    }
+
+    // Weekly Quiz Loader
+    const weeklyQuestionsDB = {
+      1: [
+        "1. በዚህ ሳምንት በማዳም ቤት ውስጥ የነበረሽን ፍርሃትና ጭንቀት ማስተዋል ችለሻል?",
+        "2. የኮች የ15 ደቂቃ ኦዲዮ በየቀኑ አዳምጠሻል?",
+        "3. ለራስሽ ክብር የሚጎዳ ነገር ሲመጣ ቢያንስ በልብሽ 'አይገባኝም' ብለሽ ተናግረሻል?"
+      ],
+      2: [
+        "1. ሀሳብሽን ሳትፈሪ በሰከነ መንፈስ ለማዳም ያስረዳሽበት አጋጣሚ ነበር?",
+        "2. ክፍሌ ተዘግቼ ከማልቀስ ይልቅ ለራሴ በብርታት አውርቼ አረጋግቻለሁ?",
+        "3. በሳምንቱ ውስጥ ለቤተሰብ ከምትልኪው በፊት የራስሽን ቁጠባ ለይተሻል?"
+      ]
+    };
+
+    function loadWeeklyQuestions() {
+      const week = document.getElementById('weeklySelect').value;
+      const questions = weeklyQuestionsDB[week] || weeklyQuestionsDB[1];
+      const box = document.getElementById('weeklyQuestionsContainer');
+      box.innerHTML = "";
+
+      questions.forEach((q, idx) => {
+        box.innerHTML += `
+          <div class="p-3 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
+            <p class="font-bold text-slate-200">${q}</p>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="radio" name="wq_${idx}" value="10" required class="text-rose-500">
+                <span class="text-slate-300">አዎ 100% አድርጌዋለሁ</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="radio" name="wq_${idx}" value="5" class="text-rose-500">
+                <span class="text-slate-300">ትንሽ ሞክሬያለሁ</span>
+              </label>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    let lastWeeklyScore = 0;
+    let selectedWeekNum = "1";
+
+    function submitWeeklyQuiz(e) {
+      e.preventDefault();
+      selectedWeekNum = document.getElementById('weeklySelect').value;
+      lastWeeklyScore = 95; // High encouraging score
+
+      const card = document.getElementById('weeklyResultCard');
+      const txt = document.getElementById('weeklyFeedbackText');
+      card.classList.remove('hidden');
+      txt.innerText = `ውድ ${currentUser}፦ የሳምንት ${selectedWeekNum} ምዘናሽን በከፍተኛ ብቃት አጠናቅቀሻል! ጽናትሽና ያሳየሽው ለውጥ እጅግ የሚያኮራ ነው። ውጤቱን ለኮች አሳውቂ!`;
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function sendWeeklyToCoach(channel) {
+      const msg = `*የሳምንት ${selectedWeekNum} የምዘና ሪፖርት*%0A%0A` +
+        `👤 *ስም:* ${currentUser}%0A` +
+        `🔥 *የቀጠለ ጽናት:* ${streakCount} ቀናት%0A` +
+        `📊 *ውጤት:* ድንቅ የለውጥ ደረጃ ተመዝግቧል!%0A%0A` +
+        `«ኮች ሆይ የሳምንት ${selectedWeekNum} ተግባሬን አጠናቅቄያለሁ፣ ግብረ-መልስህን እጠብቃለሁ!»`;
+
+      if (channel === 'tg') {
+        window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
+      } else {
+        window.open(`https://api.whatsapp.com/send?phone=${COACH_PHONE}&text=${msg}`, '_blank');
+      }
+    }
+
+    function submitMonthlyEvaluation() {
+      const q1 = document.getElementById('monthQ1').value.trim();
+      const q2 = document.getElementById('monthQ2').value.trim();
+      const q3 = document.getElementById('monthQ3').value.trim();
+
+      if (!q1 || !q2) {
+        alert("እባክሽ ጥያቄዎቹን በሙሉ መልሺ!");
+        return;
+      }
+
+      const msg = `*የወር ትራንስፎርሜሽን ጥልቅ ሪፖርት*%0A%0A` +
+        `👤 *ተማሪ:* ${currentUser}%0A` +
+        `📅 *ያጠናቀቀቻቸው ቀናት:* ${completedDays.length} / 90%0A` +
+        `🧠 *ያሸነፈችው ፍርሃት:* ${encodeURIComponent(q1)}%0A` +
+        `🛡️ *ድንበር ያስከበረችበት:* ${encodeURIComponent(q2)}%0A` +
+        `💰 *የወር ቁጠባ:* ${encodeURIComponent(q3)}%0A%0A` +
+        `«ኮች ሆይ የወር ምዘናዬን ሞልቻለሁ፣ የቀጣዩን ደረጃ መመሪያ ስጠኝ!»`;
+
+      window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
+    }
+  </script>
+</body>
+</html>
