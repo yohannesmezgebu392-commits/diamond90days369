@@ -52,8 +52,7 @@
         የዛሬው ድል ተመዝግቧል!
       </span>
       <h3 id="quoteDayHeader" class="text-base font-black text-white">የቀን 1 የኮች ቃል</h3>
-      <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl text-xs text-amber-200/90 leading-relaxed font-semibold italic" id="dailyQuoteText">
-        </div>
+      <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl text-xs text-amber-200/90 leading-relaxed font-semibold italic" id="dailyQuoteText"></div>
       <button type="button" onclick="closeQuoteModal()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-bold rounded-xl text-xs shadow-lg">
         ተቀብያለሁ፣ በብርታት እቀጥላለሁ! 💎
       </button>
@@ -284,7 +283,6 @@
     const COACH_PHONE = "251948622684";
     const COACH_TG = "Yohannesmezgebu";
 
-    // 💡 90 ቀናት ልዩ የስነ-ልቦና ማንቂያ ጥቅሶች (ምሳሌዎች በስርዓት የሚሽከረከሩ)
     const dailyMotivationalQuotes = [
       "«አንቺ የስራሽ ሰራተኛ አይደለሽም፤ አንቺ የራስሽ ህይወት ዋና መሃንዲስ ነሽ!»",
       "«ላብሽን የምታፈስሽው ለጊዜያዊ መሸጋገሪያ ነው፤ አእምሮሽን ግን ለዘላቂ ነጻነትሽ አንቂው።»",
@@ -400,4 +398,143 @@
 
       if (h1 && h2 && h3) {
         btn.disabled = false;
-        btn.className = "w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg cursor-
+        btn.className = "w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg cursor-pointer transition animate-pulse";
+      } else {
+        btn.disabled = true;
+        btn.className = "w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-2xl text-xs transition cursor-not-allowed";
+      }
+    }
+
+    function submitDailyAttendance() {
+      const todayNum = completedDays.length + 1;
+      if (!completedDays.includes(todayNum)) {
+        completedDays.push(todayNum);
+        streakCount += 1;
+        localStorage.setItem('app_completed_days', JSON.stringify(completedDays));
+        localStorage.setItem('app_streak', streakCount.toString());
+      }
+
+      showDashboard();
+      renderDaysGrid();
+
+      // Confetti Effect
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      // Show Quote Modal
+      const quoteIndex = (todayNum - 1) % dailyMotivationalQuotes.length;
+      document.getElementById('quoteDayHeader').innerText = `የቀን ${todayNum} የኮች ቃል`;
+      document.getElementById('dailyQuoteText').innerText = dailyMotivationalQuotes[quoteIndex];
+      document.getElementById('quoteModal').classList.remove('hidden');
+
+      document.getElementById('habit1').checked = false;
+      document.getElementById('habit2').checked = false;
+      document.getElementById('habit3').checked = false;
+      checkDailyCompletion();
+    }
+
+    function closeQuoteModal() {
+      document.getElementById('quoteModal').classList.add('hidden');
+    }
+
+    function renderDaysGrid() {
+      const container = document.getElementById('daysGrid');
+      container.innerHTML = "";
+      for (let i = 1; i <= 90; i++) {
+        const isDone = completedDays.includes(i);
+        const div = document.createElement('div');
+        div.className = `p-1.5 rounded-lg border ${isDone ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-600'}`;
+        div.innerText = i;
+        container.appendChild(div);
+      }
+    }
+
+    const weeklyQuestionsDB = {
+      1: [
+        "1. በዚህ ሳምንት በማዳም ቤት ውስጥ የነበረሽን ፍርሃትና ጭንቀት ማስተዋል ችለሻል?",
+        "2. የኮች የ15 ደቂቃ ኦዲዮ በየቀኑ አዳምጠሻል?",
+        "3. ለራስሽ ክብር የሚጎዳ ነገር ሲመጣ ቢያንስ በልብሽ 'አይገባኝም' ብለሽ ተናግረሻል?"
+      ],
+      2: [
+        "1. ሀሳብሽን ሳትፈሪ በሰከነ መንፈስ ለማዳም ያስረዳሽበት አጋጣሚ ነበር?",
+        "2. ክፍሌ ተዘግቼ ከማልቀስ ይልቅ ለራሴ በብርታት አውርቼ አረጋግቻለሁ?",
+        "3. በሳምንቱ ውስጥ ለቤተሰብ ከምትልኪው በፊት የራስሽን ቁጠባ ለይተሻል?"
+      ]
+    };
+
+    function loadWeeklyQuestions() {
+      const week = document.getElementById('weeklySelect').value;
+      const questions = weeklyQuestionsDB[week] || weeklyQuestionsDB[1];
+      const box = document.getElementById('weeklyQuestionsContainer');
+      box.innerHTML = "";
+
+      questions.forEach((q, idx) => {
+        box.innerHTML += `
+          <div class="p-3 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
+            <p class="font-bold text-slate-200">${q}</p>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="radio" name="wq_${idx}" value="10" required class="text-rose-500">
+                <span class="text-slate-300">አዎ 100% አድርጌዋለሁ</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer">
+                <input type="radio" name="wq_${idx}" value="5" class="text-rose-500">
+                <span class="text-slate-300">ትንሽ ሞክሬያለሁ</span>
+              </label>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    let selectedWeekNum = "1";
+
+    function submitWeeklyQuiz(e) {
+      e.preventDefault();
+      selectedWeekNum = document.getElementById('weeklySelect').value;
+
+      const card = document.getElementById('weeklyResultCard');
+      const txt = document.getElementById('weeklyFeedbackText');
+      card.classList.remove('hidden');
+      txt.innerText = `ውድ ${currentUser}፦ የሳምንት ${selectedWeekNum} ምዘናሽን በከፍተኛ ብቃት አጠናቅቀሻል! ጽናትሽና ያሳየሽው ለውጥ እጅግ የሚያኮራ ነው። ውጤቱን ለኮች አሳውቂ!`;
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function sendWeeklyToCoach(channel) {
+      const msg = `*የሳምንት ${selectedWeekNum} የምዘና ሪፖርት*%0A%0A` +
+        `👤 *ስም:* ${currentUser}%0A` +
+        `🔥 *የቀጠለ ጽናት:* ${streakCount} ቀናት%0A` +
+        `📊 *ውጤት:* ድንቅ የለውጥ ደረጃ ተመዝግቧል!%0A%0A` +
+        `«ኮች ሆይ የሳምንት ${selectedWeekNum} ተግባሬን አጠናቅቄያለሁ፣ ግብረ-መልስህን እጠብቃለሁ!»`;
+
+      if (channel === 'tg') {
+        window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
+      } else {
+        window.open(`https://api.whatsapp.com/send?phone=${COACH_PHONE}&text=${msg}`, '_blank');
+      }
+    }
+
+    function submitMonthlyEvaluation() {
+      const q1 = document.getElementById('monthQ1').value.trim();
+      const q2 = document.getElementById('monthQ2').value.trim();
+      const q3 = document.getElementById('monthQ3').value.trim();
+
+      if (!q1 || !q2) {
+        alert("እባክሽ ጥያቄዎቹን በሙሉ መልሺ!");
+        return;
+      }
+
+      const msg = `*የወር ትራንስፎርሜሽን ጥልቅ ሪፖርት*%0A%0A` +
+        `👤 *ተማሪ:* ${currentUser}%0A` +
+        `📅 *ያጠናቀቀቻቸው ቀናት:* ${completedDays.length} / 90%0A` +
+        `🧠 *ያሸነፈችው ፍርሃት:* ${encodeURIComponent(q1)}%0A` +
+        `🛡️ *ድንበር ያስከበረችበት:* ${encodeURIComponent(q2)}%0A` +
+        `💰 *የወር ቁጠባ:* ${encodeURIComponent(q3)}%0A%0A` +
+        `«ኮች ሆይ የወር ምዘናዬን ሞልቻለሁ፣ የቀጣዩን ደረጃ መመሪያ ስጠኝ!»`;
+
+      window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
+    }
+  </script>
+</body>
+</html>
