@@ -37,10 +37,10 @@
           <input type="password" id="traineeCode" placeholder="121921" class="w-full py-3 px-4 bg-slate-900 border border-slate-700 rounded-2xl text-xs text-center tracking-widest text-white focus:outline-none focus:border-rose-500">
         </div>
 
-        <button type="button" onclick="loginTrainee()" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 hover:opacity-95 font-bold rounded-2xl text-xs text-white shadow-lg transition">
+        <button type="button" onclick="loginTrainee()" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 hover:opacity-95 font-bold rounded-2xl text-xs text-white shadow-lg transition cursor-pointer">
           ወደ የግል ፖርታሌ ግባ ➔
         </button>
-        <p id="loginError" class="text-xs text-rose-400 font-semibold text-center hidden">የተሳሳተ መግቢያ ኮድ ነው!</p>
+        <p id="loginError" class="text-xs text-rose-400 font-semibold text-center hidden">የተሳሳተ መግቢያ ኮድ ነው! (ኮዱ፡ 121921)</p>
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h2 id="dashGreeting" class="text-sm font-extrabold text-white">ሰላም እህቴ</h2>
+            <h2 id="dashGreeting" class="text-sm font-extrabold text-white">ሰላም</h2>
             <button type="button" onclick="logoutTrainee()" class="text-[10px] text-slate-400 hover:text-rose-400 underline font-semibold">
               (ውጣ)
             </button>
@@ -104,7 +104,7 @@
         <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
           <div>
             <h3 class="text-sm font-bold text-white">የዛሬው የ3ቱ ድሎች አቴንዳንስ</h3>
-            <p id="currentDateStr" class="text-[11px] text-slate-400">ዛሬን በድል ጀምሪ</p>
+            <p class="text-[11px] text-slate-400">ዛሬን በድል ጀምሪ</p>
           </div>
           <span class="text-xs font-bold px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
             ቀን <span id="currentDayNum">1</span> / 90
@@ -210,7 +210,7 @@
           <div id="weeklyQuestionsContainer" class="space-y-3"></div>
 
           <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg transition">
-            የሳምንቱን ውጤት መዝግብና ሰርተፊኬት አሳይ ➔
+            የሳምንቱን ውጤት መዝግብ ➔
           </button>
         </form>
       </div>
@@ -417,12 +417,10 @@
       showDashboard();
       renderDaysGrid();
 
-      // Confetti Effect
       if (typeof confetti === 'function') {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       }
 
-      // Show Quote Modal
       const quoteIndex = (todayNum - 1) % dailyMotivationalQuotes.length;
       document.getElementById('quoteDayHeader').innerText = `የቀን ${todayNum} የኮች ቃል`;
       document.getElementById('dailyQuoteText').innerText = dailyMotivationalQuotes[quoteIndex];
