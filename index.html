@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', sans-serif;
@@ -44,6 +45,21 @@
     </div>
   </div>
 
+  <div id="quoteModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-500/40 max-w-sm w-full p-6 rounded-3xl shadow-2xl text-center space-y-4">
+      <div class="text-4xl animate-bounce">🔥</div>
+      <span class="inline-block px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-[11px] font-bold">
+        የዛሬው ድል ተመዝግቧል!
+      </span>
+      <h3 id="quoteDayHeader" class="text-base font-black text-white">የቀን 1 የኮች ቃል</h3>
+      <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl text-xs text-amber-200/90 leading-relaxed font-semibold italic" id="dailyQuoteText">
+        </div>
+      <button type="button" onclick="closeQuoteModal()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-bold rounded-xl text-xs shadow-lg">
+        ተቀብያለሁ፣ በብርታት እቀጥላለሁ! 💎
+      </button>
+    </div>
+  </div>
+
   <div id="mainDashboard" class="hidden max-w-xl mx-auto p-4 space-y-5">
     
     <div class="flex items-center justify-between bg-slate-800/80 border border-slate-700/80 p-4 rounded-3xl backdrop-blur-md">
@@ -52,7 +68,12 @@
           💎
         </div>
         <div>
-          <h2 id="dashGreeting" class="text-sm font-extrabold text-white">ሰላም እህቴ</h2>
+          <div class="flex items-center gap-2">
+            <h2 id="dashGreeting" class="text-sm font-extrabold text-white">ሰላም እህቴ</h2>
+            <button type="button" onclick="logoutTrainee()" class="text-[10px] text-slate-400 hover:text-rose-400 underline font-semibold">
+              (ውጣ)
+            </button>
+          </div>
           <p id="dashStageBadge" class="text-[11px] font-semibold text-amber-400">ደረጃ 1፦ ጭቃውን ሰባሪዋ ዘር 🏅</p>
         </div>
       </div>
@@ -64,14 +85,17 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-2 bg-slate-800/50 p-1 rounded-2xl border border-slate-800 text-xs font-bold text-center">
-      <button type="button" onclick="switchTab('daily')" id="tabDaily" class="py-2.5 rounded-xl bg-slate-700 text-white shadow transition">
-        📅 የቀን አቴንዳንስ
+    <div class="grid grid-cols-4 gap-1.5 bg-slate-800/50 p-1 rounded-2xl border border-slate-800 text-[11px] font-bold text-center">
+      <button type="button" onclick="switchTab('daily')" id="tabDaily" class="py-2 rounded-xl bg-slate-700 text-white shadow transition">
+        📅 አቴንዳንስ
       </button>
-      <button type="button" onclick="switchTab('weekly')" id="tabWeekly" class="py-2.5 rounded-xl text-slate-400 hover:text-white transition">
-        📝 ሳምንታዊ ፈተና
+      <button type="button" onclick="switchTab('goals')" id="tabGoals" class="py-2 rounded-xl text-slate-400 hover:text-white transition">
+        🎯 የጎል ቦርድ
       </button>
-      <button type="button" onclick="switchTab('monthly')" id="tabMonthly" class="py-2.5 rounded-xl text-slate-400 hover:text-white transition">
+      <button type="button" onclick="switchTab('weekly')" id="tabWeekly" class="py-2 rounded-xl text-slate-400 hover:text-white transition">
+        📝 ሳምንታዊ
+      </button>
+      <button type="button" onclick="switchTab('monthly')" id="tabMonthly" class="py-2 rounded-xl text-slate-400 hover:text-white transition">
         🏆 የወር & ፋይናል
       </button>
     </div>
@@ -125,6 +149,38 @@
           <span class="text-slate-400"><strong id="completedDaysCount" class="text-rose-400">0</strong> / 90 ተጠናቋል</span>
         </div>
         <div id="daysGrid" class="grid grid-cols-10 gap-1 text-[9px] font-bold text-center"></div>
+      </div>
+    </div>
+
+    <div id="sectionGoals" class="hidden space-y-4">
+      <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-3xl space-y-4">
+        <div class="border-b border-slate-700/70 pb-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            🎯 የ 3 ወር የራዕይ እና የውሳኔ ቦርድ (Goal Board)
+          </h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">በነዚህ 90 ቀናት ውስጥ በህይወትሽ የምታሳኪያቸውን 3 ዋና ግቦች አስቀምጪ</p>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-amber-400 mb-1">💰 ግብ 1፦ የገንዘብ እና የቁጠባ ኢላማ</label>
+            <input type="text" id="goalMoney" placeholder="ለምሳሌ፡ 90 ቀናት ውስጥ 8,000 ሪያል ቋሚ ቁጠባ ማድረግ" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400">
+          </div>
+
+          <div>
+            <label class="block font-bold text-rose-400 mb-1">🛡️ ግብ 2፦ የስነ-ልቦና እና የድንበር ለውጥ</label>
+            <input type="text" id="goalMindset" placeholder="ለምሳሌ፡ ፍርሃትን አሸንፌ ለማዳም ሀሳቤን በክብር መግለጽ" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-rose-400">
+          </div>
+
+          <div>
+            <label class="block font-bold text-sky-400 mb-1">🌟 ግብ 3፦ የነጻነት እና የሀገር ቤት እቅድ</label>
+            <input type="text" id="goalFuture" placeholder="ለምሳሌ፡ ወደ ሀገር ተመልሼ የምሰራውን የንግድ እቅድ ማዘጋጀት" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-sky-400">
+          </div>
+
+          <button type="button" onclick="saveGoalBoard()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow transition">
+            💾 የጎል ቦርዴን መዝግብና አስቀምጥ
+          </button>
+        </div>
       </div>
     </div>
 
@@ -228,6 +284,18 @@
     const COACH_PHONE = "251948622684";
     const COACH_TG = "Yohannesmezgebu";
 
+    // 💡 90 ቀናት ልዩ የስነ-ልቦና ማንቂያ ጥቅሶች (ምሳሌዎች በስርዓት የሚሽከረከሩ)
+    const dailyMotivationalQuotes = [
+      "«አንቺ የስራሽ ሰራተኛ አይደለሽም፤ አንቺ የራስሽ ህይወት ዋና መሃንዲስ ነሽ!»",
+      "«ላብሽን የምታፈስሽው ለጊዜያዊ መሸጋገሪያ ነው፤ አእምሮሽን ግን ለዘላቂ ነጻነትሽ አንቂው።»",
+      "«ፍርሃት ማዳም ቤት ውስጥ የለም፤ ፍርሃት ያለው ሳትናገሪ በቀረሽው ዝምታ ውስጥ ብቻ ነው።»",
+      "«የዛሬዋን ትንሽ ቁጠባሽን አትናቋት፤ ነገ በሀገርሽ በኩራት የምትቆሚበት ታላቅ መሰረት ናት።»",
+      "«ሰዎችን ላለማስቀየም ብለሽ ራስሽን አትጉጂ፤ በክብር 'አይሆንም' ማለት ትልቅ ኃይል ነው።»",
+      "«ብቸኝነት ሲሰማሽ አትዘጊ፤ ፈጣሪ ብቻሽን ያደረገሽ በውስጥሽ ያለውን ታላቅ ብርታት እንድታገኚው ነው።»",
+      "«አለም በ AI እና በሮቦት እየተቀየረች ነው፤ ዛሬ የተማርሽው እውቀት ነገ የማይናወጥ ዋስትናሽ ነው።»",
+      "«እውነተኛ ንግስት ማለት በፈተና መሃል ራሷንና ክብሯን ያላጣች ጠንካራ ሴት ናት!»"
+    ];
+
     let currentUser = localStorage.getItem('app_user_name') || "";
     let completedDays = JSON.parse(localStorage.getItem('app_completed_days') || "[]");
     let streakCount = parseInt(localStorage.getItem('app_streak') || "0");
@@ -236,6 +304,7 @@
       if (currentUser) {
         showDashboard();
       }
+      loadGoalBoard();
       renderDaysGrid();
       loadWeeklyQuestions();
     });
@@ -255,6 +324,13 @@
       }
     }
 
+    function logoutTrainee() {
+      if (confirm("እርግጠኛ ነሽ መውጣት ትፈልጊያለሽ? (የተመዘገበው ዳታሽ አይጠፋም)")) {
+        localStorage.removeItem('app_user_name');
+        location.reload();
+      }
+    }
+
     function showDashboard() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainDashboard').classList.remove('hidden');
@@ -263,7 +339,6 @@
       document.getElementById('completedDaysCount').innerText = completedDays.length;
       document.getElementById('currentDayNum').innerText = completedDays.length + 1;
 
-      // Update Stage Badge
       const badge = document.getElementById('dashStageBadge');
       if (completedDays.length < 30) {
         badge.innerText = "ደረጃ 1፦ ጭቃውን ሰባሪዋ ዘር 🌱";
@@ -276,23 +351,45 @@
 
     function switchTab(tab) {
       document.getElementById('sectionDaily').classList.add('hidden');
+      document.getElementById('sectionGoals').classList.add('hidden');
       document.getElementById('sectionWeekly').classList.add('hidden');
       document.getElementById('sectionMonthly').classList.add('hidden');
 
-      document.getElementById('tabDaily').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
-      document.getElementById('tabWeekly').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
-      document.getElementById('tabMonthly').className = "py-2.5 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabDaily').className = "py-2 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabGoals').className = "py-2 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabWeekly').className = "py-2 rounded-xl text-slate-400 hover:text-white transition";
+      document.getElementById('tabMonthly').className = "py-2 rounded-xl text-slate-400 hover:text-white transition";
 
       if (tab === 'daily') {
         document.getElementById('sectionDaily').classList.remove('hidden');
-        document.getElementById('tabDaily').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+        document.getElementById('tabDaily').className = "py-2 rounded-xl bg-slate-700 text-white shadow";
+      } else if (tab === 'goals') {
+        document.getElementById('sectionGoals').classList.remove('hidden');
+        document.getElementById('tabGoals').className = "py-2 rounded-xl bg-slate-700 text-white shadow";
       } else if (tab === 'weekly') {
         document.getElementById('sectionWeekly').classList.remove('hidden');
-        document.getElementById('tabWeekly').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+        document.getElementById('tabWeekly').className = "py-2 rounded-xl bg-slate-700 text-white shadow";
       } else {
         document.getElementById('sectionMonthly').classList.remove('hidden');
-        document.getElementById('tabMonthly').className = "py-2.5 rounded-xl bg-slate-700 text-white shadow";
+        document.getElementById('tabMonthly').className = "py-2 rounded-xl bg-slate-700 text-white shadow";
       }
+    }
+
+    function saveGoalBoard() {
+      const gMoney = document.getElementById('goalMoney').value.trim();
+      const gMind = document.getElementById('goalMindset').value.trim();
+      const gFut = document.getElementById('goalFuture').value.trim();
+
+      const goals = { money: gMoney, mindset: gMind, future: gFut };
+      localStorage.setItem('app_user_goals', JSON.stringify(goals));
+      alert("🎯 የ 3 ወር ራዕይና የውሳኔ ቦርድሽ በተሳካ ሁኔታ ተቀምጧል!");
+    }
+
+    function loadGoalBoard() {
+      const goals = JSON.parse(localStorage.getItem('app_user_goals') || "{}");
+      if (goals.money) document.getElementById('goalMoney').value = goals.money;
+      if (goals.mindset) document.getElementById('goalMindset').value = goals.mindset;
+      if (goals.future) document.getElementById('goalFuture').value = goals.future;
     }
 
     function checkDailyCompletion() {
@@ -303,132 +400,4 @@
 
       if (h1 && h2 && h3) {
         btn.disabled = false;
-        btn.className = "w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg cursor-pointer transition animate-pulse";
-      } else {
-        btn.disabled = true;
-        btn.className = "w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-2xl text-xs transition cursor-not-allowed";
-      }
-    }
-
-    function submitDailyAttendance() {
-      const todayNum = completedDays.length + 1;
-      if (!completedDays.includes(todayNum)) {
-        completedDays.push(todayNum);
-        streakCount += 1;
-        localStorage.setItem('app_completed_days', JSON.stringify(completedDays));
-        localStorage.setItem('app_streak', streakCount.toString());
-      }
-
-      alert(`🎉 ድንቅ ነው ${currentUser}! የቀን ${todayNum} አቴንዳንስሽን በድል መዝግበሻል!`);
-      showDashboard();
-      renderDaysGrid();
-
-      document.getElementById('habit1').checked = false;
-      document.getElementById('habit2').checked = false;
-      document.getElementById('habit3').checked = false;
-      checkDailyCompletion();
-    }
-
-    function renderDaysGrid() {
-      const container = document.getElementById('daysGrid');
-      container.innerHTML = "";
-      for (let i = 1; i <= 90; i++) {
-        const isDone = completedDays.includes(i);
-        const div = document.createElement('div');
-        div.className = `p-1.5 rounded-lg border ${isDone ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-600'}`;
-        div.innerText = i;
-        container.appendChild(div);
-      }
-    }
-
-    // Weekly Quiz Loader
-    const weeklyQuestionsDB = {
-      1: [
-        "1. በዚህ ሳምንት በማዳም ቤት ውስጥ የነበረሽን ፍርሃትና ጭንቀት ማስተዋል ችለሻል?",
-        "2. የኮች የ15 ደቂቃ ኦዲዮ በየቀኑ አዳምጠሻል?",
-        "3. ለራስሽ ክብር የሚጎዳ ነገር ሲመጣ ቢያንስ በልብሽ 'አይገባኝም' ብለሽ ተናግረሻል?"
-      ],
-      2: [
-        "1. ሀሳብሽን ሳትፈሪ በሰከነ መንፈስ ለማዳም ያስረዳሽበት አጋጣሚ ነበር?",
-        "2. ክፍሌ ተዘግቼ ከማልቀስ ይልቅ ለራሴ በብርታት አውርቼ አረጋግቻለሁ?",
-        "3. በሳምንቱ ውስጥ ለቤተሰብ ከምትልኪው በፊት የራስሽን ቁጠባ ለይተሻል?"
-      ]
-    };
-
-    function loadWeeklyQuestions() {
-      const week = document.getElementById('weeklySelect').value;
-      const questions = weeklyQuestionsDB[week] || weeklyQuestionsDB[1];
-      const box = document.getElementById('weeklyQuestionsContainer');
-      box.innerHTML = "";
-
-      questions.forEach((q, idx) => {
-        box.innerHTML += `
-          <div class="p-3 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
-            <p class="font-bold text-slate-200">${q}</p>
-            <div class="flex gap-4">
-              <label class="flex items-center gap-1 cursor-pointer">
-                <input type="radio" name="wq_${idx}" value="10" required class="text-rose-500">
-                <span class="text-slate-300">አዎ 100% አድርጌዋለሁ</span>
-              </label>
-              <label class="flex items-center gap-1 cursor-pointer">
-                <input type="radio" name="wq_${idx}" value="5" class="text-rose-500">
-                <span class="text-slate-300">ትንሽ ሞክሬያለሁ</span>
-              </label>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    let lastWeeklyScore = 0;
-    let selectedWeekNum = "1";
-
-    function submitWeeklyQuiz(e) {
-      e.preventDefault();
-      selectedWeekNum = document.getElementById('weeklySelect').value;
-      lastWeeklyScore = 95; // High encouraging score
-
-      const card = document.getElementById('weeklyResultCard');
-      const txt = document.getElementById('weeklyFeedbackText');
-      card.classList.remove('hidden');
-      txt.innerText = `ውድ ${currentUser}፦ የሳምንት ${selectedWeekNum} ምዘናሽን በከፍተኛ ብቃት አጠናቅቀሻል! ጽናትሽና ያሳየሽው ለውጥ እጅግ የሚያኮራ ነው። ውጤቱን ለኮች አሳውቂ!`;
-      card.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function sendWeeklyToCoach(channel) {
-      const msg = `*የሳምንት ${selectedWeekNum} የምዘና ሪፖርት*%0A%0A` +
-        `👤 *ስም:* ${currentUser}%0A` +
-        `🔥 *የቀጠለ ጽናት:* ${streakCount} ቀናት%0A` +
-        `📊 *ውጤት:* ድንቅ የለውጥ ደረጃ ተመዝግቧል!%0A%0A` +
-        `«ኮች ሆይ የሳምንት ${selectedWeekNum} ተግባሬን አጠናቅቄያለሁ፣ ግብረ-መልስህን እጠብቃለሁ!»`;
-
-      if (channel === 'tg') {
-        window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
-      } else {
-        window.open(`https://api.whatsapp.com/send?phone=${COACH_PHONE}&text=${msg}`, '_blank');
-      }
-    }
-
-    function submitMonthlyEvaluation() {
-      const q1 = document.getElementById('monthQ1').value.trim();
-      const q2 = document.getElementById('monthQ2').value.trim();
-      const q3 = document.getElementById('monthQ3').value.trim();
-
-      if (!q1 || !q2) {
-        alert("እባክሽ ጥያቄዎቹን በሙሉ መልሺ!");
-        return;
-      }
-
-      const msg = `*የወር ትራንስፎርሜሽን ጥልቅ ሪፖርት*%0A%0A` +
-        `👤 *ተማሪ:* ${currentUser}%0A` +
-        `📅 *ያጠናቀቀቻቸው ቀናት:* ${completedDays.length} / 90%0A` +
-        `🧠 *ያሸነፈችው ፍርሃት:* ${encodeURIComponent(q1)}%0A` +
-        `🛡️ *ድንበር ያስከበረችበት:* ${encodeURIComponent(q2)}%0A` +
-        `💰 *የወር ቁጠባ:* ${encodeURIComponent(q3)}%0A%0A` +
-        `«ኮች ሆይ የወር ምዘናዬን ሞልቻለሁ፣ የቀጣዩን ደረጃ መመሪያ ስጠኝ!»`;
-
-      window.open(`https://t.me/${COACH_TG}?text=${msg}`, '_blank');
-    }
-  </script>
-</body>
-</html>
+        btn.className = "w-full py-3.5 bg-gradient-to-r from-rose-600 to-amber-500 font-bold rounded-2xl text-xs text-white shadow-lg cursor-
